@@ -3,12 +3,15 @@ package com.aulaandroid.pokedex.model
 import com.google.gson.annotations.SerializedName
 
 data class PokemonResponse(
-    val results: List<PokemonListItem>
+    val results: List<PokemonListItem>,
+    val sprites: PokemonSprites
 )
 
 data class PokemonListItem(
     val name: String,
-    val url: String
+    val url: String,
+    val frontDefault: String,
+    val pokemonSprites: PokemonSprites
 )
 
 data class Pokemon (
@@ -18,7 +21,8 @@ data class Pokemon (
     val abilities: List<PokemonAbilitySlot>,
     val stats: List<PokemonStatSlot>,
     val weight: Int,
-    val height: Int
+    val height: Int,
+    val sprites: PokemonSprites
 )
 
 data class PokemonTypeSlot(
@@ -51,4 +55,8 @@ data class PokemonStatSlot(
 data class PokemonStat(
     val name: String,
     val url: String
+)
+
+data class PokemonSprites(
+    @SerializedName("front_default") val frontDefault: String
 )
