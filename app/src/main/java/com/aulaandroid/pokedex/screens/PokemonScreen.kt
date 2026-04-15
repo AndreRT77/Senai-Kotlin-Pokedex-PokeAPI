@@ -44,6 +44,7 @@ import coil.compose.AsyncImage
 import com.aulaandroid.pokedex.R
 import com.aulaandroid.pokedex.model.Pokemon
 import com.aulaandroid.pokedex.service.RetrofitFactory
+import com.aulaandroid.pokedex.ui.theme.PokemonType
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -189,6 +190,12 @@ fun PokemonScreen(navController: NavController, pokemonName: String) {
                             value = p.abilities.take(2).joinToString("\n") { it.ability.name.replaceFirstChar { char -> char.uppercase() } },
                             icon = null
                         )
+                        Box(modifier = Modifier.width(1.dp).height(60.dp).background(Color.Black))
+                        InfoItem(
+                            label = "Description",
+                            value = p.descriptions.take(2).joinToString("\n") { it.description.replaceFirstChar { char -> char.uppercase() } },
+                            icon = null
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -208,7 +215,7 @@ fun PokemonScreen(navController: NavController, pokemonName: String) {
                 }
 
                 AsyncImage(
-                    model = p.sprites.frontDefault,
+                    model = p.sprites.other?.officialArtwork?.frontDefault ?: p.sprites.frontDefault,
                     contentDescription = p.name,
                     modifier = Modifier
                         .size(200.dp)
@@ -237,6 +244,7 @@ fun InfoItem(label: String, value: String, icon: Int?) {
         }
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = label, fontSize = 12.sp, color = Color.Gray)
+
     }
 }
 
@@ -286,25 +294,5 @@ fun StatRow(label: String, value: Int, color: Color) {
 }
 
 fun getPokemonColor(type: String?): Color {
-    return when (type) {
-        "grass" -> Color(0xFF74CB48)
-        "fire" -> Color(0xFFF57D31)
-        "water" -> Color(0xFF6493EB)
-        "bug" -> Color(0xFFA7B723)
-        "normal" -> Color(0xFFAAA67F)
-        "poison" -> Color(0xFFA43E9E)
-        "electric" -> Color(0xFFF9CF30)
-        "ground" -> Color(0xFFDEC16B)
-        "fairy" -> Color(0xFFE69EAC)
-        "fighting" -> Color(0xFFC12239)
-        "psychic" -> Color(0xFFFB5584)
-        "rock" -> Color(0xFFB69E31)
-        "ghost" -> Color(0xFF70559B)
-        "ice" -> Color(0xFF9AD6DF)
-        "dragon" -> Color(0xFF7037FF)
-        "dark" -> Color(0xFF75574C)
-        "steel" -> Color(0xFFB7B9D0)
-        "flying" -> Color(0xFFA891EC)
-        else -> Color.LightGray
-    }
+    return PokemonType.fromApiType(type)
 }

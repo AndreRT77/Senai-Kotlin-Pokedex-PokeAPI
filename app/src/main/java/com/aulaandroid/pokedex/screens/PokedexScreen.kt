@@ -43,9 +43,11 @@ import com.aulaandroid.pokedex.model.Pokemon
 import com.aulaandroid.pokedex.model.PokemonListItem
 import com.aulaandroid.pokedex.model.PokemonResponse
 import com.aulaandroid.pokedex.service.RetrofitFactory
+import com.aulaandroid.pokedex.ui.theme.PokemonType
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.Locale
 
 @Composable
 fun PokedexScreen(navController: NavController, modifier: Modifier = Modifier) {
@@ -54,7 +56,7 @@ fun PokedexScreen(navController: NavController, modifier: Modifier = Modifier) {
     val pokemonDetails = remember { mutableStateMapOf<String, Pokemon>() }
 
     LaunchedEffect(Unit) {
-        RetrofitFactory().getPokemonService().listPokemon(limit = 20).enqueue(object : Callback<PokemonResponse> {
+        RetrofitFactory().getPokemonService().listPokemon(limit = 50).enqueue(object : Callback<PokemonResponse> {
             override fun onResponse(call: Call<PokemonResponse>, response: Response<PokemonResponse>) {
                 if (response.isSuccessful) {
                     response.body()?.results?.let { results ->
@@ -155,47 +157,39 @@ fun PokedexScreen(navController: NavController, modifier: Modifier = Modifier) {
 
 @Composable
 fun PokemonCard(item: PokemonListItem, pokemon: Pokemon?, navController: NavController) {
-    val backgroundColor = when (pokemon?.types?.firstOrNull()?.type?.name) {
-        "grass" -> Color(0xFF74CB48)
-        "fire" -> Color(0xFFF57D31)
-        "water" -> Color(0xFF6493EB)
-        "bug" -> Color(0xFFA7B723)
-        "normal" -> Color(0xFFAAA67F)
-        "poison" -> Color(0xFFA43E9E)
-        "electric" -> Color(0xFFF9CF30)
-        "ground" -> Color(0xFFDEC16B)
-        "fairy" -> Color(0xFFE69EAC)
-        "fighting" -> Color(0xFFC12239)
-        "psychic" -> Color(0xFFFB5584)
-        "rock" -> Color(0xFFB69E31)
-        "ghost" -> Color(0xFF70559B)
-        "ice" -> Color(0xFF9AD6DF)
-        "dragon" -> Color(0xFF7037FF)
-        "dark" -> Color(0xFF75574C)
-        "steel" -> Color(0xFFB7B9D0)
-        "flying" -> Color(0xFFA891EC)
-        else -> Color.LightGray
-    }
+    val backgroundColor = PokemonType.fromApiType(
+        pokemon?.types?.firstOrNull()?.type?.name
+    )
 
     Card(
         onClick = { navController.navigate("PokemonScreen/${item.name}") },
         modifier = Modifier
-            .size(158.dp)
+            .size(200.dp)
             .padding(4.dp),
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(8.dp),
+            modifier = Modifier.fillMaxSize().padding(20.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                text = String.format(Locale.getDefault(), "#%03d", pokemon?.id ?: 0),
+                color = Color.White,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.End,
+                modifier = Modifier.padding(end = 5.dp)
+            )
             if (pokemon != null) {
                 AsyncImage(
-                    model = pokemon.sprites.frontDefault,
+                    model = pokemon.sprites.other?.officialArtwork?.frontDefault ?: pokemon.sprites.frontDefault,
                     contentDescription = pokemon.name,
                     modifier = Modifier.size(100.dp)
                 )
             }
+
+
             Text(
                 text = item.name.replaceFirstChar { it.uppercase() },
                 textAlign = TextAlign.Center,
